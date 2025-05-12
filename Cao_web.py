@@ -241,7 +241,8 @@ for page in range(start_page, max_total_pages + 1):
 
             # Kích thước
             try:
-                kthuoc = post.find_element(By.CLASS_NAME, "ct_kt").text.strip().replace("KT:", "").replace("m", "").strip()
+                kthuoc = (post.find_element(By.CLASS_NAME, "ct_kt").text.strip()
+                          .replace("KT:", "").replace("m", "").strip())
                 if kthuoc and kthuoc != "..." and kthuoc != "---":
                      kthuoc_parts = [p.strip() for p in kthuoc.split("x") if p.strip()]
                      if len(kthuoc_parts) >= 1:
