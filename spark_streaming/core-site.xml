@@ -1,0 +1,16 @@
+<configuration>
+    <property>
+        <name>hadoop.security.authentication</name>
+        <value>simple</value>
+    </property>
+    <property>
+        <name>hadoop.security.authorization</name>
+        <value>false</value>
+    </property>
+
+    <property>
+      <name>fs.viewfs.impl</name>
+      <value>org.apache.hadoop.fs.DoNotLoadViewFS</value>
+      <description>Attempt to prevent ViewFileSystem from loading.</description>
+    </property>
+</configuration>

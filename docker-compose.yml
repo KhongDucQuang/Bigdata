@@ -1,0 +1,187 @@
+version: '3.7'
+
+services:
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - lambda_net
+
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - lambda_net
+
+  hadoop-namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode
+    environment:
+      - CLUSTER_NAME=test
+    ports:
+      - "9870:9870"
+    volumes:
+      - namenode:/hadoop/dfs/name
+    networks:
+      - lambda_net
+
+  hadoop-datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:8020
+    volumes:
+      - datanode:/hadoop/dfs/data
+    depends_on:
+      - hadoop-namenode
+    networks:
+      - lambda_net
+
+  spark-master:
+    image: bde2020/spark-master:2.4.4-hadoop2.7
+    container_name: spark_master
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+    volumes:
+      - ./spark_jobs:/app/spark_jobs
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    networks:
+      - lambda_net
+
+  spark-worker:
+    image: bde2020/spark-worker:2.4.4-hadoop2.7
+    container_name: spark_worker
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    networks:
+      - lambda_net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    networks:
+      - lambda_net
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+  kafka-hdfs-consumer:
+    build:
+      context: ./kafka_consumer
+      dockerfile: Dockerfile
+    container_name: kafka-hdfs-consumer
+    depends_on:
+      - kafka
+      - hadoop-namenode
+      - hadoop-datanode
+    networks:
+      - lambda_net
+    restart: on-failure
+  kafka-producer:
+    build:
+      context: ./kafka_producer
+      dockerfile: Dockerfile
+    container_name: kafka-producer
+    depends_on:
+      - kafka-hdfs-consumer
+    networks:
+      - lambda_net
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - lambda_net
+  spark-batch-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - lambda_net
+
+  spark-streaming-job:
+    build:
+      context: ./spark_streaming
+      dockerfile: Dockerfile
+    container_name: spark_streaming_job
+    depends_on:
+      - kafka
+      - elasticsearch
+      - hadoop-namenode
+    networks:
+      - lambda_net
+    command: >
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.3,org.elasticsearch:elasticsearch-spark-30_2.12:8.13.4
+      /app/spark_streaming_job.py
+    restart: on-failure
+
+  spark-streaming-median-district:
+    build:
+      context: ./spark_streaming
+      dockerfile: Dockerfile
+    container_name: spark_streaming_median_district
+    depends_on: [ kafka, elasticsearch, hadoop-namenode ]
+    networks: [ lambda_net ]
+    command: >
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.3,org.elasticsearch:elasticsearch-spark-30_2.12:8.13.4
+      /app/streaming_median_price_m2_by_district.py
+    environment:
+      - KAFKA_TOPIC=real-estate-topic
+      - ES_INDEX_MEDIAN_DISTRICT=realtime_district_median_price_m2
+      - CHECKPOINT_LOCATION_MEDIAN_DISTRICT=hdfs://hadoop-namenode:8020/user/spark_checkpoints/streaming_median_price_district
+    restart: on-failure
+
+  spark-streaming-anomaly:
+    build:
+      context: ./spark_streaming
+      dockerfile: Dockerfile
+    container_name: spark_streaming_anomaly
+    depends_on: [ kafka, elasticsearch, hadoop-namenode ]
+    networks: [ lambda_net ]
+    command: > 
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.3,org.elasticsearch:elasticsearch-spark-30_2.12:8.13.4
+      /app/streaming_price_anomaly_alert.py
+    environment:
+      - KAFKA_TOPIC=real-estate-topic
+      - ES_INDEX_ANOMALY=realtime_price_anomalies
+      - CHECKPOINT_LOCATION_ANOMALY=hdfs://hadoop-namenode:8020/user/spark_checkpoints/streaming_price_anomaly
+      - BATCH_VIEW_HDFS_PATH=hdfs://hadoop-namenode:8020//user/batch_views_spark/avg_price_per_m2_by_city
+      - ANOMALY_THRESHOLD_PERCENT=0.30
+    restart: on-failure
+volumes:
+  namenode:
+  datanode:
+  esdata: {}
+networks:
+  lambda_net:
