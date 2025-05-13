@@ -33,8 +33,8 @@ if __name__ == "__main__":
 
         df = df.withColumn("city_norm", normalize_city_name(col("thanh_pho"))) \
                .filter(col("city_norm").isin("HaNoi", "HoChiMinh")) \
-               .filter(col("gia_ban").isNotNull() & (col("gia_ban").cast("float") > 0)) \
-               .filter(col("dien_tich").isNotNull() & (col("dien_tich").cast("float") >= 5)) \
+               .filter(col("gia_ban").isNotNull() & (col("gia_ban").cast("float") > 0) & (col("gia_ban").cast("float") < 1000)) \
+               .filter(col("dien_tich").isNotNull() & (col("dien_tich").cast("float") >= 10) & (col("dien_tich").cast("float") <= 1000)) \
                .filter(col("ngay_dang").isNotNull())
 
         #Tính toán giá trên m2 cho mỗi tin
