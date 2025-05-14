@@ -5,7 +5,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json, lower, trim, when, window, count
 from pyspark.sql.types import StructType, StructField, StringType, FloatType, IntegerType, TimestampType, DoubleType
 
-# --- Hàm chuẩn hóa tên thành phố (Giữ nguyên) ---
+# --- Hàm chuẩn hóa tên thành phố ---
 def normalize_city_name(city_col):
     """Chuẩn hóa tên thành phố về HaNoi hoặc HoChiMinh."""
     city_lower = lower(trim(city_col))
@@ -13,8 +13,6 @@ def normalize_city_name(city_col):
           .when(city_lower.like("%hà nội%"), "HaNoi") \
           .otherwise(None)
 
-# --- Định nghĩa Schema cho dữ liệu JSON từ Kafka ---
-# Dựa trên bản ghi mẫu bạn cung cấp
 schema = StructType([
     StructField("ngay_dang", StringType(), True),
     StructField("duong_pho", StringType(), True),
