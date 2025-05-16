@@ -72,6 +72,7 @@ services:
     container_name: spark_worker
     environment:
       - SPARK_MASTER=spark://spark-master:7077
+      - PYSPARK_PYTHON=python3.7
     depends_on:
       - spark-master
     ports:
@@ -91,6 +92,7 @@ services:
       - lambda_net
     volumes:
       - esdata:/usr/share/elasticsearch/data
+
   kafka-hdfs-consumer:
     build:
       context: ./kafka_consumer
@@ -133,10 +135,11 @@ services:
       - spark-master
       - hadoop-namenode
       - hadoop-datanode
-      - kafka
-      - elasticsearch
-      - kibana
     restart: "no"
+    environment:
+      - PYTHONIOENCODING=UTF-8
+      - PYSPARK_PYTHON=python3.7
+      - PYSPARK_DRIVER_PYTHON=python3.7
 
   spark-streaming-job:
     build:
