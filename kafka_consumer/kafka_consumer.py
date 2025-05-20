@@ -15,18 +15,16 @@ log = logging.getLogger(__name__)
 
 # --- Cấu hình ---
 KAFKA_BROKER_URL = 'kafka:9092'
-KAFKA_TOPIC = 'real-estate-topic'  # Hoặc 'alonhadat' tùy bạn chọn
-KAFKA_GROUP_ID = 'hdfs-writer-group-dynamic-final-v1'  # Thay đổi để reset offset nếu cần
+KAFKA_TOPIC = 'real-estate-topic'
+KAFKA_GROUP_ID = 'hdfs-writer-group-dynamic-final-v1'
 
 HDFS_URL = 'http://hadoop-namenode:9870'
 HDFS_USER = 'root'
-HDFS_BASE_PATH = '/user/kafka_data/real_estate_by_date'  # Hoặc /user/root/realestate_data/raw/alonhadat
+HDFS_BASE_PATH = '/user/kafka_data/real_estate_by_date'
 
 BATCH_SIZE = 100
 BATCH_INTERVAL_SECONDS = 60
 
-# --- Khai báo biến toàn cục cho các client và trạng thái ---
-# Chúng sẽ được khởi tạo trong vòng lặp của __main__
 hdfs_client = None
 consumer = None
 hdfs_ready = False
@@ -34,7 +32,7 @@ hdfs_ready = False
 
 # --- Hàm ghi batch vào file HDFS mới ---
 def write_data_to_new_hdfs_file(current_hdfs_client, base_hdfs_path, batch_data_list):
-    global hdfs_ready, hdfs_client  # Để có thể đặt lại nếu lỗi nghiêm trọng
+    global hdfs_ready, hdfs_client
     if not batch_data_list:
         log.info("CONSUMER_DEBUG: Batch rỗng, không có gì để ghi vào HDFS.")
         return True
@@ -73,10 +71,8 @@ def write_data_to_new_hdfs_file(current_hdfs_client, base_hdfs_path, batch_data_
 
 # --- Hàm chính để tiêu thụ và ghi dữ liệu ---
 def consume_and_write(MAX_TIME_INTERVAL=60):
-    # Sử dụng các biến global đã được khởi tạo (hoặc sẽ được khởi tạo lại) bởi vòng lặp trong __main__
     global hdfs_client, consumer, hdfs_ready
 
-    # Kiểm tra lại lần nữa nếu các client đã sẵn sàng chưa (phòng trường hợp)
     if not (hdfs_ready and consumer and hdfs_client):
         log.error("CONSUMER_CRITICAL: consume_and_write được gọi nhưng HDFS hoặc Kafka client chưa sẵn sàng.")
         # Đặt hdfs_ready = False để vòng lặp __main__ bên ngoài biết cần khởi tạo lại mọi thứ
@@ -188,14 +184,10 @@ def consume_and_write(MAX_TIME_INTERVAL=60):
         hdfs_ready = False
         if consumer: consumer.close(); consumer = None
         return  # Thoát consume_and_write
-    # Khối finally của consume_and_write chỉ nên ghi batch cuối nếu không có lỗi nghiêm trọng
-    # Việc đóng client sẽ do __main__ hoặc shutdown_handler đảm nhiệm khi hàm này thoát
-    # Tuy nhiên, để an toàn, nếu thoát bình thường (không phải do exception), cũng nên ghi batch cuối
+
     finally:
         log.info("CONSUMER_INFO: Kết thúc một phiên làm việc của consume_and_write.")
-        # Ghi nốt batch cuối nếu thoát bình thường mà không phải do KeyboardInterrupt và client còn tốt
-        # KeyboardInterrupt sẽ được xử lý bởi shutdown_handler
-        # Các lỗi khác khiến client hỏng thì nên để __main__ khởi tạo lại từ đầu
+
         if message_batch and hdfs_client and hdfs_ready and not isinstance(
                 e_main_loop if 'e_main_loop' in locals() else None, KeyboardInterrupt):
             log.info(
@@ -205,17 +197,8 @@ def consume_and_write(MAX_TIME_INTERVAL=60):
 
 # --- Xử lý tín hiệu dừng ---
 def shutdown_handler(signum, frame):
-    global consumer, hdfs_client, hdfs_ready, message_batch  # Cần truy cập message_batch nếu nó toàn cục
-    # Hoặc truyền nó vào đây, hoặc logic ghi batch cuối phải khác
+    global consumer, hdfs_client, hdfs_ready, message_batch
     log.warning(f"APP_INFO: Nhận được tín hiệu {signal.Signals(signum).name}. Đang dừng ứng dụng...")
-
-    # Ghi nốt batch cuối cùng nếu có và client còn tốt
-    # Biến message_batch hiện tại là local của consume_and_write, nên cách này không truy cập được.
-    # Cách tốt nhất là để khối finally của consume_and_write xử lý batch cuối khi KeyboardInterrupt.
-    # Hoặc consume_and_write trả về message_batch khi thoát để __main__ xử lý.
-    # Hiện tại, chúng ta dựa vào KeyboardInterrupt sẽ kích hoạt finally trong consume_and_write (nếu nó đang ở đó)
-    # hoặc finally trong __main__ (nếu có).
-    # Đoạn này chỉ đóng consumer.
 
     if consumer:
         try:

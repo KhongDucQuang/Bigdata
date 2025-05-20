@@ -7,12 +7,13 @@
     <list default="true" id="cf4fc3ba-770d-404e-a034-c5cf1d1e1361" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spark_jobs/avg_cost_city_month.py" beforeDir="false" afterPath="$PROJECT_DIR$/spark_jobs/avg_cost_city_month.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spark_jobs/avg_cost_city_month_median.py" beforeDir="false" afterPath="$PROJECT_DIR$/spark_jobs/avg_cost_city_month_median.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/Readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kafka_consumer/kafka_consumer.py" beforeDir="false" afterPath="$PROJECT_DIR$/kafka_consumer/kafka_consumer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scheduler_spark_jobs.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduler_spark_jobs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/spark_jobs/avg_price_per_m2_by_district.py" beforeDir="false" afterPath="$PROJECT_DIR$/spark_jobs/avg_price_per_m2_by_district.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spark_jobs/count_by_district.py" beforeDir="false" afterPath="$PROJECT_DIR$/spark_jobs/count_by_district.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spark_jobs/output/median_price/HaNoi.json" beforeDir="false" afterPath="$PROJECT_DIR$/spark_jobs/output/median_price/hanoi.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/spark_jobs/run_all_spark_jobs.sh" beforeDir="false" afterPath="$PROJECT_DIR$/spark_jobs/run_all_spark_jobs.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spark_jobs/upload_json_to_es.py" beforeDir="false" afterPath="$PROJECT_DIR$/spark_jobs/upload_json_to_es.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -54,24 +54,15 @@ def run_spark_batch_job():
     except Exception as e:
         logger.error(f"SCHEDULER_ERROR: Đã xảy ra lỗi không mong muốn khi chạy Spark batch job: {e}", exc_info=True)
 
-# --- Thiết lập Lịch trình ---
 if __name__ == "__main__":
-    #logger.info(f"Scheduler đã khởi động. Sẽ chạy job '{SPARK_BATCH_SERVICE_NAME}' mỗi {SCHEDULE_INTERVAL_HOURS} giờ.")
 
-    # Lập lịch cho job
-    #schedule.every(SCHEDULE_INTERVAL_HOURS).hours.do(run_spark_batch_job)
-
-    # --- Ví dụ các cách lập lịch khác (bỏ comment để dùng thử) ---
     logger.info(f"Scheduler đã khởi động. Sẽ chạy job '{SPARK_BATCH_SERVICE_NAME}' mỗi 10 phút.")
     schedule.every(10).minutes.do(run_spark_batch_job) # Mỗi 10 phút
-    # schedule.every().day.at("10:30").do(run_spark_batch_job) # Mỗi ngày vào 10:30 sáng
-    # schedule.every().monday.do(run_spark_batch_job) # Mỗi thứ Hai
-    # schedule.every().wednesday.at("13:15").do(run_spark_batch_job) # Mỗi thứ Tư lúc 13:15
 
     try:
         while True:
-            schedule.run_pending() # Kiểm tra và chạy các tác vụ đang chờ
-            time.sleep(1)          # Ngủ 1 giây để không chiếm CPU quá nhiều
+            schedule.run_pending()
+            time.sleep(1)
     except KeyboardInterrupt:
         logger.info("Scheduler đã bị dừng bởi người dùng (Ctrl+C).")
     except Exception as e:

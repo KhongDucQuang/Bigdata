@@ -5,7 +5,7 @@ from elasticsearch.helpers import bulk
 # Kết nối Elasticsearch
 es = Elasticsearch("http://localhost:9200")
 
-INDEX_NAME = "hcm_district_cost_avg"
+INDEX_NAME = "hcm_median_avg_by_month"
 
 # Tạo index nếu chưa có
 if not es.indices.exists(index=INDEX_NAME):
@@ -21,7 +21,7 @@ def read_json_lines(file_path):
                     "_source": doc
                 }
 
-json_file_path = "./output/avg_cost/avg_cost_hcm.json"
+json_file_path = "output/median_price/HoChiMinh.json"
 
 # Đẩy dữ liệu
 try:

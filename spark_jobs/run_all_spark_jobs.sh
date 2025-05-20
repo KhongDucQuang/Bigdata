@@ -1,12 +1,11 @@
 #!/bin/bash
 echo "Bắt đầu thực thi các Spark jobs..."
 
-# Đường dẫn tới spark-submit (đã có trong ENTRYPOINT của Dockerfile, nhưng có thể gọi lại nếu cần)
+# Đường dẫn tới spark-submit
 SPARK_SUBMIT_CMD="/opt/bitnami/spark/bin/spark-submit"
-# Cấu hình chung cho các job (thay thế bằng cấu hình thực tế của bạn)
-SPARK_MASTER_URL="spark://spark-master:7077" # Thay thế spark-master bằng tên service Spark Master của bạn
+# Cấu hình chung cho các job
+SPARK_MASTER_URL="spark://spark-master:7077"
 
-# Đường dẫn tới các file job Python bên trong container (do WORKDIR /app và COPY ./spark_jobs/)
 JOB_PATH_PREFIX="/app/spark_jobs"
 
 echo "Đang chạy job: avg_cost_city_month.py"

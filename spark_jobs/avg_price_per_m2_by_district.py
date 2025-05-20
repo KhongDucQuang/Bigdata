@@ -70,8 +70,8 @@ if __name__ == "__main__":
         # Chuẩn hóa thành phố và lọc
         processed_df = raw_df.withColumn("city_norm", normalize_city_name(col("thanh_pho"))) \
             .filter(col("city_norm").isin("HaNoi", "HoChiMinh")) \
-            .filter(col("dien_tich").isNotNull() & (col("dien_tich").cast("float") >= 5)) \
-            .filter(col("gia_ban").isNotNull() & (col("gia_ban").cast("float") > 0)) \
+            .filter(col("dien_tich").isNotNull() & (col("dien_tich").cast("float") >= 10)) \
+            .filter(col("gia_ban").isNotNull() & (col("gia_ban").cast("float") > 0) & (col("gia_ban").cast("float") < 1000)) \
             .filter(col("quan_huyen").isNotNull() & (trim(col("quan_huyen")) != ""))
 
         if processed_df.rdd.isEmpty():
