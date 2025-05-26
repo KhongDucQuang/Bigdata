@@ -40,4 +40,14 @@ $SPARK_SUBMIT_CMD \
 echo "Hoàn thành job: count_by_district_by_city_to_es.py"
 echo "----------------------------------------"
 
+echo "Đang chạy job: comprehensive_real_estate_analysis.py"
+$SPARK_SUBMIT_CMD \
+  --master $SPARK_MASTER_URL \
+  --packages org.elasticsearch:elasticsearch-spark-20_2.11:8.13.4 \
+  --conf "spark.driver.memory=4g" \
+  --conf "spark.executor.memory=4g" \
+  $JOB_PATH_PREFIX/comprehensive_real_estate_analysis.py
+echo "Hoàn thành job: comprehensive_real_estate_analysis.py"
+echo "----------------------------------------"
+
 echo "Tất cả các Spark jobs đã được thực thi."

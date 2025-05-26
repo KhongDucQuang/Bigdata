@@ -1,0 +1,4 @@
+{"month":2,"avg_price_m2":261.0946114628697,"listing_count":51,"price_std":99.53239792176342,"yearly_avg":250.4031982343824,"seasonal_idx":104.26967918296313,"is_peak_season":false,"is_low_season":false}
+{"month":3,"avg_price_m2":240.62145978039865,"listing_count":11133,"price_std":143.72581307333286,"yearly_avg":250.4031982343824,"seasonal_idx":96.09360482495602,"is_peak_season":false,"is_low_season":false}
+{"month":4,"avg_price_m2":244.14753694922746,"listing_count":19642,"price_std":134.00609541205435,"yearly_avg":250.4031982343824,"seasonal_idx":97.50176462231146,"is_peak_season":false,"is_low_season":false}
+{"month":5,"avg_price_m2":272.7830405782231,"listing_count":10332,"price_std":145.47690782164025,"yearly_avg":250.4031982343824,"seasonal_idx":108.93752256426563,"is_peak_season":true,"is_low_season":false}

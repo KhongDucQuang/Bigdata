@@ -140,6 +140,8 @@ services:
       - PYTHONIOENCODING=UTF-8
       - PYSPARK_PYTHON=python3.7
       - PYSPARK_DRIVER_PYTHON=python3.7
+    volumes:
+      - ./output_ML:/app/spark_jobs/output_comprehensive_analysis
 
   spark-streaming-job:
     build:

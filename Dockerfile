@@ -13,23 +13,21 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget https://bootstrap.pypa.io/pip/3.7/get-pip.py && \
-    python3.7 get-pip.py && \
+    /usr/bin/python3.7 get-pip.py && \
     rm get-pip.py
 
-RUN if [ -L /usr/bin/python3 ]; then rm /usr/bin/python3; fi && \
-    ln -sf /usr/bin/python3.7 /usr/bin/python3
+RUN /usr/bin/python3.7 -m pip install numpy pandas matplotlib
 
-RUN if [ -L /usr/bin/pip3 ]; then rm /usr/bin/pip3; fi && \
+# Chọn python3.7 làm mặc định
+RUN ln -sf /usr/bin/python3.7 /usr/bin/python3 && \
     ln -sf /usr/local/bin/pip /usr/bin/pip3
 
-RUN echo "Kiểm tra phiên bản Python sau khi cài đặt:" && \
-    python3 --version && \
-    pip3 --version
+ENV PYTHONIOENCODING=UTF-8
+ENV PYSPARK_PYTHON=/usr/bin/python3.7
+ENV PYSPARK_DRIVER_PYTHON=/usr/bin/python3.7
 
 ENV HOME=/tmp
 ENV HADOOP_USER_NAME=root
-ENV PYTHONIOENCODING=UTF-8
-
 ENV SPARK_DRIVER_EXTRA_JAVA_OPTIONS="-Duser.name=root"
 ENV SPARK_EXECUTOR_EXTRA_JAVA_OPTIONS="-Duser.name=root"
 ENV HADOOP_CONF_DIR="/opt/bitnami/spark/conf"
@@ -42,6 +40,6 @@ WORKDIR /app
 COPY spark_jobs/ ./spark_jobs/
 COPY spark_conf/core-site.xml /opt/bitnami/spark/conf/core-site.xml
 
-RUN chmod +x ./spark_jobs/run_all_spark_jobs.sh # Hoặc tên script wrapper của bạn
+RUN chmod +x ./spark_jobs/run_all_spark_jobs.sh
 
 ENTRYPOINT ["/app/spark_jobs/run_all_spark_jobs.sh"]

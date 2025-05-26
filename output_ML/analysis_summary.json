@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-05-23 19:26:58",
+  "total_records_analyzed": 81303,
+  "hanoi": {
+    "hotspot_count": 8,
+    "avg_price_growth": 381.73460081225636
+  },
+  "hochiminh": {
+    "hotspot_count": 10,
+    "avg_price_growth": 15.995882646378462
+  }
+}
